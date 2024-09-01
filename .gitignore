@@ -5,3 +5,4 @@ logs/
 settings.json
 gui_layout.json
 .cubyz/
+compiler/
