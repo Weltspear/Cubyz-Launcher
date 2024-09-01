@@ -60,6 +60,7 @@ hasBackground: bool = true,
 hideIfMouseIsGrabbed: bool = true, // TODO: Allow the user to change this with a button, to for example leave the inventory open while playing.
 closeIfMouseIsGrabbed: bool = false,
 isHud: bool = false,
+isClosable: bool = true,
 
 // TODO: Option to disable the close button for certain windows that cannot be reopened.
 
@@ -153,11 +154,17 @@ pub fn mainButtonReleased(self: *GuiWindow, mousePosition: Vec2f) void {
 			}
 		}
 		if(self.showTitleBar or self.titleBarExpanded) {
-			if(mousePosition[0] - self.pos[0] > self.size[0] - 48*self.scale) {
-				if(mousePosition[0] - self.pos[0] > self.size[0] - 32*self.scale) {
-					if(mousePosition[0] - self.pos[0] > self.size[0] - 16*self.scale) {
+
+			var additionalOffset: f32 = 0;
+			if (!self.isClosable)
+				additionalOffset += 16*self.scale;
+
+			if(mousePosition[0] - self.pos[0] > self.size[0] - 48*self.scale + additionalOffset) {
+				if(mousePosition[0] - self.pos[0] > self.size[0] - 32*self.scale + additionalOffset) {
+					if(mousePosition[0] - self.pos[0] > self.size[0] - 16*self.scale + additionalOffset) {
 						// Close
-						gui.closeWindow(self);
+						if (self.isClosable)
+							gui.closeWindow(self);
 						return;
 					} else {
 						// Zoom out
@@ -447,9 +454,14 @@ fn drawOrientationLines(self: *const GuiWindow) void {
 
 pub fn drawIcons(self: *const GuiWindow) void {
 	draw.setColor(0xffffffff);
-	closeTexture.render(.{self.size[0]/self.scale - 18, 0}, .{18, 18});
-	zoomOutTexture.render(.{self.size[0]/self.scale - 36, 0}, .{18, 18});
-	zoomInTexture.render(.{self.size[0]/self.scale - 54, 0}, .{18, 18});
+	if (self.isClosable){
+		closeTexture.render(.{self.size[0]/self.scale - 18, 0}, .{18, 18});
+		zoomOutTexture.render(.{self.size[0]/self.scale - 36, 0}, .{18, 18});
+		zoomInTexture.render(.{self.size[0]/self.scale - 54, 0}, .{18, 18});
+	} else{
+		zoomOutTexture.render(.{self.size[0]/self.scale - 18, 0}, .{18, 18});
+		zoomInTexture.render(.{self.size[0]/self.scale - 36, 0}, .{18, 18});
+	}
 }
 
 pub fn render(self: *const GuiWindow, mousePosition: Vec2f) void {

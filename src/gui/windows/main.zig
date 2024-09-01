@@ -9,6 +9,7 @@ const GuiComponent = gui.GuiComponent;
 const GuiWindow = gui.GuiWindow;
 const Button = @import("../components/Button.zig");
 const VerticalList = @import("../components/VerticalList.zig");
+const HorizontalList = @import("../components/HorizontalList.zig");
 
 const http = main.http;
 const archive = main.archive;
@@ -16,6 +17,7 @@ const files = main.files;
 
 pub var window = GuiWindow {
 	.contentSize = Vec2f{128, 256},
+	.isClosable = false
 };
 
 const padding: f32 = 8;
@@ -129,13 +131,14 @@ pub fn play(_:usize) void {
 }
 
 pub fn onOpen() void {
-	const list = VerticalList.init(.{padding, 16 + padding}, 300, 16);
+	const list = HorizontalList.init();//VerticalList.init(.{padding, 16 + padding}, 300, 16);
 	list.add(Button.initText(.{0, 0}, 128, "Play", .{.callback = &play,}));
 	list.add(Button.initText(.{0, 0}, 128, "Settings", gui.openWindowCallback("settings")));
 	list.add(Button.initText(.{0, 0}, 128, "Touch Grass",  .{.callback = &exitGame}));
-	list.finish(.center);
+	list.finish( .{padding, 256 - 2*padding - 16}, .center);
 	window.rootComponent = list.toComponent();
-	window.contentSize = window.rootComponent.?.pos() + window.rootComponent.?.size() + @as(Vec2f, @splat(padding));
+	//window.contentSize = window.rootComponent.?.pos() + window.rootComponent.?.size() + @as(Vec2f, @splat(padding));
+	window.contentSize = Vec2f{512, 256};
 	gui.updateWindowPositions();
 }
 
